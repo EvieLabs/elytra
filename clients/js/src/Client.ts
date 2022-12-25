@@ -34,6 +34,8 @@ export class Client {
     path: string,
     body?: any
   ): Promise<ClientResponse<T>> {
+    await this.setup();
+
     const res = await fetch(`${this.options.apiRoot}${path}`, {
       method,
       headers: {

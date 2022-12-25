@@ -5,6 +5,7 @@ import { LangService } from "./services/LangService";
 export interface ClientOptions {
   apiRoot: string;
   lang?: string;
+  token?: string;
 }
 
 export interface ClientResponse<T> {
@@ -37,6 +38,7 @@ export class Client {
       method,
       headers: {
         "Content-Type": "application/json",
+        Authorization: this.options.token || "",
       },
       body: JSON.stringify(body),
     });

@@ -19,7 +19,7 @@ export class Client {
     this.setup();
   }
 
-  private initPromise?: Promise<void>;
+  private _setup = false;
 
   public lang: LangService;
 
@@ -93,13 +93,9 @@ export class Client {
    * @returns Promise that resolves when the client is ready to be used
    */
   public async setup() {
-    if (this.initPromise) {
-      return this.initPromise;
-    }
-
-    this.initPromise = this.init();
-
-    return this.initPromise;
+    if (this._setup) return;
+    this._setup = true;
+    await this.init();
   }
 
   private async init() {

@@ -7,17 +7,31 @@ export class Players extends RouteAdapter {
   /**
    * Get an online player's data
    * @param target Username or UUID of the player to get
+   * @returns Player data or null
+   */
+  public async get(target: string): Promise<Player | null>;
+  /**
+   * Unsafely get an online player's data
+   * @param target Username or UUID of the player to get
    * @returns Player data
    */
-  public async get(target: string): Promise<Player>;
+  public async get(target: string, safe: false): Promise<Player>;
   /**
    * Get all online players' data
    * @returns Player data
    */
   public async get(): Promise<Player[]>;
-  public async get(target?: string): Promise<Player | Player[]> {
-    if (target) return this.getPlayer(target);
-    return await this.getPlayers();
+  public async get(
+    target?: string,
+    safe = true
+  ): Promise<Player | Player[] | null> {
+    try {
+      if (target) return this.getPlayer(target);
+      return await this.getPlayers();
+    } catch (e) {
+      if (safe) return null;
+      throw e;
+    }
   }
 
   private async getPlayer(target: string) {

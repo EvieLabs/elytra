@@ -9,3 +9,8 @@
 # Elytra
 
 Elytra is a PaperMC plugin that implements an API server that turns your Minecraft server into a microservice.
+
+## Features
+
+- Official client libraries for Node.js and more to come.
+- Player manipulation.

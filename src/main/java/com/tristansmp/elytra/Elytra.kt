@@ -1,5 +1,6 @@
 package com.tristansmp.elytra
 
+import com.tristansmp.elytra.lib.ConfigManager
 import com.tristansmp.elytra.plugins.configureHTTP
 import com.tristansmp.elytra.plugins.configureRouting
 import com.tristansmp.elytra.plugins.configureSerialization
@@ -10,6 +11,11 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class Elytra : JavaPlugin() {
 
+    companion object {
+        lateinit var instance: Elytra
+    }
+
+    lateinit var config: ConfigManager
 
     override fun onEnable() {
         Thread {
@@ -17,6 +23,9 @@ class Elytra : JavaPlugin() {
                 .start(wait = true)
         }.start()
 
+        instance = this
+
+        config = ConfigManager()
     }
 
     override fun onDisable() {

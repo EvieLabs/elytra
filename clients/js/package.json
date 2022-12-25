@@ -1,0 +1,29 @@
+{
+  "name": "elytra",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Tristan Camejo <contact@tristancamejo.com>",
+  "license": "Apache-2.0",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "dev": "tsup --watch --onSuccess \"node .\"",
+    "build": "tsup",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9",
+    "inquirer": "^9.1.4",
+    "tsup": "^6.5.0",
+    "typescript": "^4.9.4"
+  },
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "zod": "^3.20.2"
+  }
+}

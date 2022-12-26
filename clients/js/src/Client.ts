@@ -16,7 +16,6 @@ export interface ClientResponse<T> {
 export class Client {
   constructor(private readonly options: ClientOptions) {
     this.lang = new LangService({ lang: options.lang });
-    this.setup();
   }
 
   private _setup = false;
@@ -95,11 +94,9 @@ export class Client {
   public async setup() {
     if (this._setup) return;
     this._setup = true;
-    await this.init();
-  }
 
-  private async init() {
     const res = await this.health.ping();
+
     this.minecraftVersion = res.headers.get("X-Minecraft-Version") || "Unknown";
     this.bukkitVersion = res.headers.get("X-Bukkit-Version") || "Unknown";
 

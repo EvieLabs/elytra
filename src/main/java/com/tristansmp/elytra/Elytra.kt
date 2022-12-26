@@ -1,6 +1,8 @@
 package com.tristansmp.elytra
 
+import com.tristansmp.elytra.events.ChatListener
 import com.tristansmp.elytra.lib.ConfigManager
+import com.tristansmp.elytra.lib.MemoryStore
 import com.tristansmp.elytra.plugins.configureHTTP
 import com.tristansmp.elytra.plugins.configureRouting
 import com.tristansmp.elytra.plugins.configureSerialization
@@ -16,6 +18,7 @@ class Elytra : JavaPlugin() {
     }
 
     lateinit var config: ConfigManager
+    lateinit var mstore: MemoryStore
 
     override fun onEnable() {
         Thread {
@@ -26,6 +29,9 @@ class Elytra : JavaPlugin() {
         instance = this
 
         config = ConfigManager()
+        mstore = MemoryStore()
+
+        server.pluginManager.registerEvents(ChatListener(), this)
     }
 
     override fun onDisable() {

@@ -61,6 +61,8 @@ async function playerMenu(player) {
         "Remove item",
         "Teleport",
         "Go back",
+        "Send message",
+        "Collect message",
       ],
     },
   ]);
@@ -144,6 +146,41 @@ async function playerMenu(player) {
 
       console.log("Done!");
       break;
+    case "Send message":
+      const message = await inquirer.prompt([
+        {
+          type: "input",
+          name: "message",
+          message: "Message",
+        },
+      ]);
+
+      await player.chat.send(message.message);
+
+      console.log("Done!");
+      break;
+    case "Collect message":
+      await player.chat.createCollector();
+
+      await new Promise((resolve) => {
+        const check = async () => {
+          const message = await player.chat.checkCollector();
+
+          if (message.status === "collected") {
+            console.log(`Message: ${message.result}`);
+            resolve();
+          } else {
+            console.log(`No message yet, ${message.status}...`);
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            check();
+          }
+        };
+
+        check();
+      });
+
     case "Go back":
       menu();
       return;

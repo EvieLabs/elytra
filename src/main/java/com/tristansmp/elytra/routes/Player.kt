@@ -1,5 +1,6 @@
 package com.tristansmp.elytra.routes
 
+import com.tristansmp.elytra.Elytra
 import com.tristansmp.elytra.lib.SerializeUtils
 import com.tristansmp.elytra.lib.getName
 import io.ktor.server.application.*
@@ -23,6 +24,10 @@ data class LocationPOST(
     val z: Double,
     val yaw: Float,
     val pitch: Float
+)
+
+data class ChatPOST(
+    val message: String
 )
 
 fun Player.toJson(): Map<String, Any?> {
@@ -111,6 +116,42 @@ fun Route.Player() {
             }
 
             call.respond(player!!.toJson())
+        }
+
+        post("/{target}/chat") {
+            val req = call.receive<ChatPOST>()
+
+            player!!.sendMessage(req.message)
+
+            call.respond(player!!.toJson())
+        }
+
+        post("/{target}/chat/collector") {
+            val existing = Elytra.instance.mstore.get<Boolean>("cc:${player!!.uniqueId}:needs_collection")
+
+            if (existing != null && existing) {
+                call.respond(mapOf("status" to "collector-exists"))
+                return@post
+            }
+
+            Elytra.instance.mstore.set("cc:${player!!.uniqueId}:needs_collection", true)
+
+            call.respond(mapOf("status" to "collector-created"))
+        }
+
+        get("/{target}/chat/collector") {
+            val status = Elytra.instance.mstore.get<Boolean>("cc:${player!!.uniqueId}:needs_collection")
+            val result = Elytra.instance.mstore.get<String>("cc:${player!!.uniqueId}:results")
+
+            when {
+                result != null -> {
+                    Elytra.instance.mstore.remove("cc:${player!!.uniqueId}:results")
+                    call.respond(mapOf("status" to "collected", "result" to result))
+                }
+
+                status == null -> call.respond(mapOf("status" to "no-collector"))
+                status -> call.respond(mapOf("status" to "waiting"))
+            }
         }
 
         intercept(Plugins) {

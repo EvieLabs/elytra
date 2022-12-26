@@ -10,18 +10,24 @@ import org.bukkit.event.Listener
 class ChatListener : Listener {
     @EventHandler
     fun onPlayerChat(event: AsyncChatEvent) {
-        val needsCollection = Elytra.instance.mstore.get<Boolean>("cc:${event.player.uniqueId}:needs_collection")
-
-        if (needsCollection == null || !needsCollection) {
-            return
-        }
-
-        event.isCancelled = true
-
         try {
             val message = event.message() as TextComponent
 
-            Elytra.instance.mstore.set("cc:${event.player.uniqueId}:results", message.content())
+            if (!message.content().startsWith("~")) {
+                return
+            }
+
+            event.isCancelled = true
+
+            val content = message.content().substring(1)
+
+            val needsCollection = Elytra.instance.mstore.get<Boolean>("cc:${event.player.uniqueId}:needs_collection")
+
+            if (needsCollection == null || !needsCollection) {
+                return
+            }
+
+            Elytra.instance.mstore.set("cc:${event.player.uniqueId}:results", content)
 
             event.player.sendMessage("§d[Elytra] §aMessage collected.")
 

@@ -3,6 +3,7 @@ import type { PlayerPayload } from "../schemas/infer";
 import { Base } from "./Base";
 import { Inventory } from "./Inventory";
 import { Location } from "./Location";
+import { PermissionNode } from "./permissions";
 import { PlayerChatManager } from "./PlayerChatManager";
 
 export class Player extends Base {
@@ -42,4 +43,8 @@ export class Player extends Base {
   public inventory: Inventory;
 
   public chat: PlayerChatManager;
+
+  public get permissions() {
+    return this.data.permissions.map((p) => new PermissionNode(this.client, p));
+  }
 }

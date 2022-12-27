@@ -1,3 +1,4 @@
+// @ts-check
 import inquirer from "inquirer";
 import { Client } from "./dist/index.js";
 
@@ -23,6 +24,8 @@ async function getAllPlayers() {
 
   const selectedPlayer = players.find((player) => player.name === player.name);
 
+  if (!selectedPlayer) return getAllPlayers();
+
   return playerMenu(selectedPlayer);
 }
 
@@ -35,7 +38,7 @@ async function getPlayer() {
     },
   ]);
 
-  const player = await client.players.get(nameOrUUID.nameOrUUID);
+  const player = await client.players.get(nameOrUUID.nameOrUUID, false);
 
   console.table({
     "Player Name": player.name,
@@ -50,6 +53,8 @@ async function getPlayer() {
  * @param {import("./dist/index").Player} player
  */
 async function playerMenu(player) {
+  player = await client.players.get(player.uuid, false); // Refresh player data
+
   const playerOption = await inquirer.prompt([
     {
       type: "list",
@@ -63,6 +68,7 @@ async function playerMenu(player) {
         "Go back",
         "Send message",
         "Collect message",
+        "Inspect permissions",
       ],
     },
   ]);
@@ -86,13 +92,17 @@ async function playerMenu(player) {
           message: "What item do you want to dupe?",
           choices: player.inventory.items
             .filter((item) => item !== null)
+            // @ts-ignore
             .map((item) => item.type),
         },
       ]);
 
       const itemToDupe = player.inventory.items.find(
+        // @ts-ignore
         (item) => item.type === selectedItem.item
       );
+
+      if (!itemToDupe) return playerMenu(player);
 
       await player.inventory.addItem(itemToDupe);
 
@@ -106,12 +116,14 @@ async function playerMenu(player) {
           message: "What item do you want to remove?",
           choices: player.inventory.items
             .filter((item) => item !== null)
+            // @ts-ignore
             .map((item) => item.type),
         },
       ]);
 
       await player.inventory.removeItem(
         player.inventory.items.findIndex(
+          // @ts-ignore
           (item) => item.type === itemToRemove.item
         )
       );
@@ -139,9 +151,12 @@ async function playerMenu(player) {
       ]);
 
       await player.location.set({
+        world: "world",
         x: Number(location.x),
         y: Number(location.y),
         z: Number(location.z),
+        yaw: 0,
+        pitch: 0,
       });
 
       console.log("Done!");
@@ -162,24 +177,91 @@ async function playerMenu(player) {
     case "Collect message":
       await player.chat.createCollector();
 
-      await new Promise((resolve) => {
-        const check = async () => {
-          const message = await player.chat.checkCollector();
+      await /** @type {Promise<void>} */ (
+        new Promise((resolve) => {
+          const check = async () => {
+            const message = await player.chat.checkCollector();
 
-          if (message.status === "collected") {
-            console.log(`Message: ${message.result}`);
-            resolve();
-          } else {
-            console.log(`No message yet, ${message.status}...`);
+            if (message.status === "collected") {
+              console.log(`Message: ${message.result}`);
+              resolve();
+            } else {
+              console.log(`No message yet, ${message.status}...`);
 
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+              await new Promise((resolve) => setTimeout(resolve, 1000));
 
-            check();
-          }
-        };
+              check();
+            }
+          };
 
-        check();
-      });
+          check();
+        })
+      );
+    case "Inspect permissions":
+      async function permissionsMenu() {
+        const permissions = player.permissions;
+
+        console.table(permissions);
+
+        const choice = await inquirer.prompt([
+          {
+            type: "list",
+            name: "permission",
+            message: "What permission do you want to inspect?",
+            choices: [
+              "Add permission",
+              ...permissions.map((permission) => permission.identifier),
+              "Go back",
+            ],
+          },
+        ]);
+
+        if (choice.permission === "Go back") return playerMenu(player);
+
+        if (choice.permission === "Add permission") {
+          const permissionToAdd = await inquirer.prompt([
+            {
+              type: "input",
+              name: "permission",
+              message: "Permission",
+            },
+          ]);
+
+          await client.lp.addPermission(player, permissionToAdd.permission);
+
+          console.log("Done!");
+
+          return permissionsMenu();
+        }
+
+        const permission = permissions.find(
+          (permission) => permission.identifier === choice.permission
+        );
+
+        if (!permission) throw new Error("Permission not found");
+
+        const permissionAction = await inquirer.prompt([
+          {
+            type: "list",
+            name: "action",
+            message: "What do you want to do?",
+            choices: ["Remove from player", "Go back"],
+          },
+        ]);
+
+        switch (permissionAction.action) {
+          case "Remove from player":
+            await client.lp.removePermission(player, permission.identifier);
+            console.log("Done!");
+            break;
+          case "Go back":
+            await permissionsMenu();
+            return;
+        }
+      }
+
+      await permissionsMenu();
+      break;
 
     case "Go back":
       menu();

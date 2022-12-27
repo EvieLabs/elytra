@@ -3,6 +3,7 @@ package com.tristansmp.elytra.routes
 import com.tristansmp.elytra.Elytra
 import com.tristansmp.elytra.lib.SerializeUtils
 import com.tristansmp.elytra.lib.getName
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.application.ApplicationCallPipeline.ApplicationPhase.Plugins
 import io.ktor.server.request.*
@@ -49,7 +50,8 @@ fun Player.toJson(): Map<String, Any?> {
         "inventory" to mapOf(
             "contents" to inventory.contents.map { it?.toJson() },
             "armorContents" to inventory.armorContents.map { it?.toJson() }
-        )
+        ),
+        "permissions" to effectivePermissions.map { it.permission }
     )
 }
 
@@ -68,7 +70,6 @@ fun ItemStack.toJson(): Map<String, Any?> {
 
 fun Route.Player() {
     route("/players") {
-
         var player: Player? = null
 
         get("/{target}") {
@@ -171,6 +172,7 @@ fun Route.Player() {
             }
 
             if (player == null) {
+                call.response.status(HttpStatusCode.NotFound)
                 call.respond(player?.toJson() ?: mapOf("error" to "Player not found"))
                 return@intercept finish()
             }

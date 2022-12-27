@@ -2,6 +2,7 @@ package com.tristansmp.elytra.plugins
 
 import com.tristansmp.elytra.Elytra
 import com.tristansmp.elytra.routes.Health
+import com.tristansmp.elytra.routes.LuckPerms
 import com.tristansmp.elytra.routes.Player
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -33,5 +34,6 @@ fun Application.configureRouting() {
 
         Health()
         Player()
+        LuckPerms()
     }
 }

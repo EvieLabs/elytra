@@ -1,4 +1,5 @@
 import { Health } from "./routes/Health";
+import { LuckPerms } from "./routes/LuckPerms";
 import { Players } from "./routes/Players";
 import { LangService } from "./services/LangService";
 
@@ -24,6 +25,7 @@ export class Client {
 
   public health = new Health(this);
   public players = new Players(this);
+  public lp = new LuckPerms(this);
 
   public minecraftVersion = "Unknown";
   public bukkitVersion = "Unknown";

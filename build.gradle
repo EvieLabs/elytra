@@ -35,6 +35,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'com.akuleshov7:ktoml-core:0.3.0'
     implementation 'com.akuleshov7:ktoml-file:0.3.0'
+    compileOnly 'net.luckperms:api:5.4'
 }
 
 def targetJavaVersion = 17

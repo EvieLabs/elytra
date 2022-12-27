@@ -16,4 +16,5 @@ export const PlayerSchema = z.object({
   ip: z.string().nullable(),
   location: LocationSchema,
   inventory: InventorySchema,
+  permissions: z.array(z.string()),
 });

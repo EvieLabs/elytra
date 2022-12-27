@@ -17,8 +17,6 @@ class ChatListener : Listener {
                 return
             }
 
-            event.isCancelled = true
-
             val content = message.content().substring(1)
 
             val needsCollection = Elytra.instance.mstore.get<Boolean>("cc:${event.player.uniqueId}:needs_collection")
@@ -26,6 +24,8 @@ class ChatListener : Listener {
             if (needsCollection == null || !needsCollection) {
                 return
             }
+
+            event.isCancelled = true
 
             Elytra.instance.mstore.set("cc:${event.player.uniqueId}:results", content)
 

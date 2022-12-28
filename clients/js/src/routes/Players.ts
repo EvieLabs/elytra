@@ -36,9 +36,7 @@ export class Players extends RouteAdapter {
 
   private async getPlayer(target: string) {
     return this.constructPlayer(
-      await (
-        await this.client.get<Player>(`/players/${target}`)
-      ).data
+      (await this.client.get<Player>(`/players/${target}`)).data
     );
   }
 

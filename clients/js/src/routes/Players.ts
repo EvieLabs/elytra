@@ -25,9 +25,17 @@ export class Players extends RouteAdapter {
     target?: string,
     safe = true
   ): Promise<Player | Player[] | null> {
+    let p: Promise<Player | Player[]>;
+
+    if (target) {
+      p = this.getPlayer(target);
+    } else {
+      p = this.getPlayers();
+    }
+
     try {
-      if (target) return this.getPlayer(target);
-      return await this.getPlayers();
+      const data = await p;
+      return data;
     } catch (e) {
       if (safe) return null;
       throw e;

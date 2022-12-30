@@ -4,7 +4,7 @@ import { RouteAdapter } from "./RouteAdapter";
 export class LuckPerms extends RouteAdapter {
   /**
    * Adds a permission node to the player
-   * @param target Username or UUID of the player to target
+   * @param target Player or UUID of the LuckPerms user to target
    * @param perm Permission node to add
    * @throws If something goes wrong
    */
@@ -17,7 +17,7 @@ export class LuckPerms extends RouteAdapter {
 
   /**
    * Removes a permission node from the player
-   * @param target Username or UUID of the player to target
+   * @param target Player or UUID of the LuckPerms user to target
    * @param perm Permission node to remove
    * @throws If something goes wrong
    */

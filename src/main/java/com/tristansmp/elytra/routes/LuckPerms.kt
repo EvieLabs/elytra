@@ -6,6 +6,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.future.await
 import net.luckperms.api.node.Node
 import java.util.*
 
@@ -27,11 +28,7 @@ fun Route.LuckPerms() {
 
             val permission = call.parameters["permission"]!!
 
-            val lpUser = try {
-                lp.userManager.getUser(UUID.fromString(call.parameters["target"]!!))
-            } catch (e: IllegalArgumentException) {
-                lp.userManager.getUser(call.parameters["target"]!!)
-            }
+            val lpUser = lp.userManager.loadUser(UUID.fromString(call.parameters["target"]!!)).await()
 
             if (lpUser == null) {
                 call.response.status(HttpStatusCode.NotFound)
@@ -58,11 +55,7 @@ fun Route.LuckPerms() {
                 return@post
             }
 
-            val lpUser = try {
-                lp.userManager.getUser(UUID.fromString(call.parameters["target"]!!))
-            } catch (e: IllegalArgumentException) {
-                lp.userManager.getUser(call.parameters["target"]!!)
-            }
+            val lpUser = lp.userManager.loadUser(UUID.fromString(call.parameters["target"]!!)).await()
 
             if (lpUser == null) {
                 call.response.status(HttpStatusCode.NotFound)

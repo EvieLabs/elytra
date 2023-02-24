@@ -13,7 +13,8 @@ import java.io.IOException
 
 @Serializable
 data class Config(
-    val token: String?,
+    val token: String? = null,
+    val linkAccountEndpoint: String? = null,
 )
 
 class ConfigManager {
@@ -32,7 +33,7 @@ class ConfigManager {
 
         if (!file.exists()) {
             try {
-                Toml(outputConfig = outputConfig).encodeToString(Config(null)).toByteArray()
+                Toml(outputConfig = outputConfig).encodeToString(Config()).toByteArray()
                     .also { file.writeBytes(it) }
             } catch (ex: IOException) {
                 ex.printStackTrace()

@@ -2,3 +2,9 @@ name: elytra
 version: '${version}'
 main: com.tristansmp.elytra.Elytra
 api-version: 1.19
+
+commands:
+  elink:
+    description: Elytra link command
+    usage: /elink <code>
+    permission: elytra.link

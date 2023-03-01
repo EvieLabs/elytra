@@ -1,5 +1,6 @@
 package com.tristansmp.elytra
 
+import com.tristansmp.elytra.commands.CommandLink
 import com.tristansmp.elytra.events.ChatListener
 import com.tristansmp.elytra.lib.ConfigManager
 import com.tristansmp.elytra.lib.MemoryStore
@@ -44,6 +45,7 @@ class Elytra : JavaPlugin() {
         }
 
         server.pluginManager.registerEvents(ChatListener(), this)
+        this.getCommand("elink")?.setExecutor(CommandLink())
     }
 
     override fun onDisable() {

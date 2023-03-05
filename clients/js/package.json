@@ -1,6 +1,6 @@
 {
   "name": "elytra",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Tristan Camejo <contact@tristancamejo.com>",

@@ -9,10 +9,15 @@ import io.ktor.server.application.ApplicationCallPipeline.ApplicationPhase.Plugi
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.block.ShulkerBox
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.BlockStateMeta
 import java.util.*
+
 
 data class InventoryPOST(
     val b64: String
@@ -56,6 +61,23 @@ fun Player.toJson(): Map<String, Any?> {
 }
 
 fun ItemStack.toJson(): Map<String, Any?> {
+
+    var itemLore: List<String> = listOf()
+
+    if (itemMeta.hasLore()) {
+        itemLore = itemMeta.lore()!!.map {
+            LegacyComponentSerializer.legacyAmpersand().serialize(it)
+        }
+    }
+
+    var itemsInside = listOf<Map<String, Any?>?>()
+
+    if (type == Material.SHULKER_BOX) {
+        val box = (itemMeta as BlockStateMeta).blockState as ShulkerBox
+
+        itemsInside = box.inventory.contents.map { it?.toJson() }
+    }
+
     return mapOf(
         "name" to itemMeta.getName(),
         "id" to type.name,
@@ -64,6 +86,8 @@ fun ItemStack.toJson(): Map<String, Any?> {
         "durability" to durability,
         "enchantments" to enchantments.map { it.key.name to it.value }.toMap(),
         "b64" to SerializeUtils.itemStackToBase64(this),
+        "lore" to itemLore,
+        "itemsInside" to itemsInside
     )
 
 }
@@ -76,7 +100,7 @@ fun Route.Player() {
             call.respond(player!!.toJson())
         }
 
-        get() {
+        get {
             call.respond(Bukkit.getOnlinePlayers().map { it.toJson() })
         }
 

@@ -34,6 +34,21 @@ export class ItemStack extends Base {
     return this.data.enchantments;
   }
 
+  public get lore() {
+    return this.data.lore;
+  }
+
+  public get itemsInside(): (ItemStack | null)[] {
+    return this.data.itemsInside.map((i) =>
+      i === null
+        ? null
+        : new ItemStack(this.client, {
+            ...i,
+            itemsInside: [],
+          })
+    );
+  }
+
   /**
    * Serialized data of the item encoded in base64
    */
